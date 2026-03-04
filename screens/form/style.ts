@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
   subTitile: {
     fontSize: RFValue(16),
     fontWeight: "600",
-    color: "#333333",
+    color: colors["text-primary"],
     marginBottom: 4,
   },
   containerInstructions: {
@@ -35,10 +35,12 @@ export const styles = StyleSheet.create({
     padding: 16,
   },
   containerButton: {
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "center",
+    alignItems: "center",
     width: "100%",
     marginBottom: 24,
+    gap: 16,
   },
   inputContainer: {
     width: "100%",
@@ -65,6 +67,8 @@ export const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: RFValue(16),
     position: "relative",
+    paddingTop: RFValue(16),
+    backgroundColor: "#8F8176",
   },
   checkboxContainer: {
     flexDirection: "row",
@@ -80,13 +84,18 @@ export const styles = StyleSheet.create({
   },
   checkboxText: {
     flex: 1,
-    fontSize: RFValue(14),
-    color: "#333333",
+    fontSize: RFValue(12),
+    color: colors["text-secondary"],
   },
   header: {
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  image: {
+    width: RFValue(120),
+    height: RFValue(120),
+    borderRadius: 10,
   },
 });

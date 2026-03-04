@@ -67,6 +67,7 @@ export const styles = StyleSheet.create({
   },
   backgound: {
     flex: 1,
+    backgroundColor: "#8F8176",
   },
   dropdownContainer: {
     position: "absolute",

@@ -1,4 +1,9 @@
-import { PRIZES_TABLE, store } from "@/storge/store";
+import {
+  addRowSafe,
+  ensureStoreInitialized,
+  PRIZES_TABLE,
+  store,
+} from "@/storge/store";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -44,6 +49,7 @@ export function Admin() {
   // 🚀 Carrega os prêmios e escuta alterações
   useEffect(() => {
     const loadPrizes = async () => {
+      await ensureStoreInitialized();
       const table = store.getTable(PRIZES_TABLE) as unknown as Record<
         string,
         Prize
@@ -62,12 +68,12 @@ export function Admin() {
   }, []);
 
   // ➕ Adiciona um prêmio novo
-  const addPrize = () => {
+  const addPrize = async () => {
     if (!name || !quant || !color || !prizeReal) {
       Alert.alert("Atenção", "Preencha os camopos corretamente");
       return;
     }
-    store.addRow(PRIZES_TABLE, {
+    await addRowSafe(PRIZES_TABLE, {
       name,
       color,
       probability: parseInt(probability),
@@ -85,7 +91,8 @@ export function Admin() {
   };
 
   // ❌ Deleta um prêmio
-  const deletePrize = (rowId: string) => {
+  const deletePrize = async (rowId: string) => {
+    await ensureStoreInitialized();
     store.delRow(PRIZES_TABLE, rowId);
   };
 
@@ -100,7 +107,7 @@ export function Admin() {
         .json()
         .then((res) => res.response.prizers)) as Prize[];
       for (let i in data) {
-        store.addRow(PRIZES_TABLE, {
+        await addRowSafe(PRIZES_TABLE, {
           name: data[i].name,
           color: data[i].color,
           probability: data[i].probability,

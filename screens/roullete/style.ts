@@ -6,9 +6,10 @@ export const styles = StyleSheet.create({
   Container: {
     width: "100%",
     gap: 16,
-    marginTop: RFValue(40),
+    paddingTop: RFValue(40),
     alignContent: "center",
     flex: 1,
+    backgroundColor: colors["background-theme"],
   },
   backgound: {
     flex: 1,
@@ -33,6 +34,7 @@ export const styles = StyleSheet.create({
     padding: 16,
     alignItems: "center",
     width: "100%",
+    gap: 16,
   },
   background: {
     flex: 1,
@@ -65,6 +67,7 @@ export const styles = StyleSheet.create({
     color: "#4B5563", // equivalente ao tw`text-gray-700`
     fontWeight: "bold",
     padding: 16,
+    fontSize: RFValue(12),
   },
   modalContainer: {
     flex: 1,
@@ -102,5 +105,10 @@ export const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: RFValue(22),
+  },
+  image: {
+    width: RFValue(150),
+    height: RFValue(150),
+    borderRadius: 10,
   },
 });

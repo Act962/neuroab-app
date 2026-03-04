@@ -7,8 +7,8 @@ export function LogoAbsolut({ ...props }: Props) {
   return (
     <Image
       {...props}
-      source={require("@/assets/logo-neurolab.png")}
-      style={styles.image}
+      source={require("@/assets/logo-neurolab-basic.jpeg")}
+      style={[styles.image, props.style]}
     />
   );
 }

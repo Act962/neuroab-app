@@ -2,8 +2,10 @@ import { Button } from "@/components/buttom";
 import { Input } from "@/components/input/Input";
 import { LogoAbsolut } from "@/components/LogoAbsolut";
 import { usePage } from "@/hooks/use-page";
+import { colors } from "@/shared/colors";
 import { store, USERS_TABLE } from "@/storge/store";
 import { MaterialIcons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { CircleCheck, CircleDashed } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
@@ -63,14 +65,14 @@ export function Form() {
 
   return (
     <View style={styles.backgound}>
-      <LogoAbsolut />
+      <LogoAbsolut style={{ top: RFValue(20) }} />
       <ScrollView keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()}>
             <MaterialIcons
               name="arrow-back"
               size={RFValue(20)}
-              color="purple"
+              color={colors["text-primary"]}
             />
           </TouchableOpacity>
           <Text style={styles.Title}>Cadastro</Text>
@@ -78,7 +80,7 @@ export function Form() {
             style={{ opacity: 0 }}
             name="arrow-back"
             size={RFValue(20)}
-            color="purple"
+            color={colors["text-primary"]}
           />
         </View>
 
@@ -133,9 +135,15 @@ export function Form() {
           >
             <View style={styles.checkboxContainer}>
               {isConfirmed ? (
-                <CircleCheck color={"#333333"} size={RFValue(25)} />
+                <CircleCheck
+                  color={colors["text-primary"]}
+                  size={RFValue(25)}
+                />
               ) : (
-                <CircleDashed color={"#333333"} size={RFValue(25)} />
+                <CircleDashed
+                  color={colors["text-primary"]}
+                  size={RFValue(25)}
+                />
               )}
 
               <Text style={styles.checkboxText}>
@@ -154,6 +162,10 @@ export function Form() {
             size={20}
             onPress={onSubmit}
             disable={!isConfirmed}
+          />
+          <Image
+            source={require("@/assets/logo-neurolab.png")}
+            style={styles.image}
           />
         </View>
       </ScrollView>

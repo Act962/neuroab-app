@@ -11,12 +11,18 @@ import {
 import ConfettiCannon from "react-native-confetti-cannon";
 import Svg, { Circle, G, Path, Text as SvgText } from "react-native-svg";
 
-import { PRIZES_TABLE, store, updateRow } from "@/storge/store";
+import {
+  ensureStoreInitialized,
+  PRIZES_TABLE,
+  store,
+  updateRow,
+} from "@/storge/store";
 
 import { Button } from "@/components/buttom";
 import { LogoAbsolut } from "@/components/LogoAbsolut";
 import { usePage } from "@/hooks/use-page";
 import { Prize } from "@/types/Prizes";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { RFValue } from "react-native-responsive-fontsize";
 import { styles } from "./style";
@@ -52,7 +58,8 @@ export function Roullete() {
 
   // ✅ CORRIGIDO: Seguindo o padrão do Admin
   useEffect(() => {
-    const loadPrizes = () => {
+    const loadPrizes = async () => {
+      await ensureStoreInitialized();
       const table = store.getTable(PRIZES_TABLE) as unknown as Record<
         string,
         Prize
@@ -367,6 +374,10 @@ export function Roullete() {
           title={isSpinning ? "Girando..." : "Girar Roleta"}
           onPress={spin}
           disabled={isSpinning}
+        />
+        <Image
+          source={require("@/assets/logo-neurolab.png")}
+          style={styles.image}
         />
       </View>
 

@@ -11,7 +11,6 @@ export default function RootLayout() {
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { padding: 8 },
         }}
       >
         <Stack.Screen name="index" />
