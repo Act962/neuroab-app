@@ -1,24 +1,33 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+import { store as globalAppStore } from "@/storge/store";
+import { Stack } from "expo-router";
+import { SystemBars } from "react-native-edge-to-edge";
+import "react-native-reanimated";
+import { Provider as TinybaseProvider } from "tinybase/ui-react";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+    <TinybaseProvider store={globalAppStore}>
+      <SystemBars style="dark" hidden={true} />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { padding: 8 },
+        }}
+      >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="form" />
+        <Stack.Screen name="users" />
+        <Stack.Screen name="roullete" />
+        <Stack.Screen name="admin" options={{ title: "Painel Admin" }} />
+        <Stack.Screen
+          name="settings-midia"
+          options={{ title: "Configurações de mídia" }}
+        />
+        <Stack.Screen
+          name="carousel"
+          options={{ contentStyle: { backgroundColor: "#000" } }}
+        />
       </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    </TinybaseProvider>
   );
 }
