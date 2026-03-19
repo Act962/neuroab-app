@@ -5,6 +5,8 @@ import {
   store,
   USERS_TABLE,
 } from "@/storge/store";
+import * as FileSystem from "expo-file-system/legacy";
+import * as Sharing from "expo-sharing";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -18,12 +20,20 @@ import {
 } from "react-native";
 import tw from "twrnc";
 
+const SAVED_FILES_TABLE = "saved_files";
+
 interface User {
   id: string;
   name: string;
   email: string;
   phone: string;
   nota: string;
+}
+
+interface SavedFile {
+  uri: string;
+  name: string;
+  date: string;
 }
 
 export function Users() {
@@ -39,7 +49,7 @@ export function Users() {
   const handleClear = async (): Promise<void> => {
     try {
       await clearTable(USERS_TABLE);
-      get(); // Atualiza a lista
+      get();
       Alert.alert("Sucesso", "Todos os dados foram apagados.");
     } catch (error) {
       console.error("Erro ao limpar storage:", error);
@@ -88,23 +98,115 @@ export function Users() {
 
   const get = (): void => {
     const data = store.getTable(USERS_TABLE);
-    const response: User[] = Object.entries(data).map(([id, user]) => ({
-      id,
-      name: String(user.name),
-      email: String(user.email),
-      phone: String(user.phone),
-      game: String("Roleta"),
-      nota: String("Leads da clinica tercio resende"),
-    }));
+    const response: User[] = Object.entries(data).map(
+      ([id, user]: [string, any]) => ({
+        id,
+        name: String(user.name),
+        email: String(user.email),
+        phone: String(user.phone),
+        game: String("Roleta"),
+        nota: String("Leads da clinica tercio resende"),
+      }),
+    );
     setUsers(response);
-    // console.log('📦 Dados atuais:', data); //Mostrar dados no console
+  };
+
+  const getSavedFiles = (): SavedFile[] => {
+    const data = store.getTable(SAVED_FILES_TABLE);
+    return Object.values(data).map((file: any) => ({
+      uri: String(file.uri),
+      name: String(file.name),
+      date: String(file.date),
+    }));
+  };
+
+  const saveUsersToFile = async (): Promise<void> => {
+    try {
+      const header = "Nome,Email,Telefone,Nota";
+      const rows = users.map(
+        (user) =>
+          `"${user.name || ""}","${user.email || ""}","${user.phone || ""}","${user.nota || ""}"`,
+      );
+
+      const csvContent = [header, ...rows].join("\n");
+      const date = new Date().toISOString().split("T")[0];
+      const fileName = `usuarios_${date}_${Date.now()}.csv`;
+      const fileUri = FileSystem.documentDirectory + fileName;
+
+      await FileSystem.writeAsStringAsync(fileUri, csvContent, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      const fileId = Date.now().toString();
+      store.setCell(SAVED_FILES_TABLE, fileId, "uri", fileUri);
+      store.setCell(SAVED_FILES_TABLE, fileId, "name", fileName);
+      store.setCell(SAVED_FILES_TABLE, fileId, "date", date);
+
+      Alert.alert("Arquivo salvo", `Salvo como: ${fileName}`, [
+        {
+          text: "Compartilhar",
+          onPress: async () => {
+            if (await Sharing.isAvailableAsync()) {
+              await Sharing.shareAsync(fileUri);
+            }
+          },
+        },
+        { text: "OK" },
+      ]);
+    } catch (error) {
+      console.error("Erro ao salvar arquivo:", error);
+      Alert.alert("Erro", "Não foi possível salvar o arquivo.");
+    }
+  };
+
+  const exportUsersToCSV = async (): Promise<void> => {
+    try {
+      const header = "Nome,Email,Telefone,Nota";
+      const rows = users.map(
+        (user) =>
+          `"${user.name || ""}","${user.email || ""}","${user.phone || ""}","${user.nota || ""}"`,
+      );
+
+      const csvContent = [header, ...rows].join("\n");
+      const date = new Date().toISOString().split("T")[0];
+      const fileName = `usuarios_${date}_${Date.now()}.csv`;
+      const fileUri = FileSystem.documentDirectory + fileName;
+
+      await FileSystem.writeAsStringAsync(fileUri, csvContent, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      Alert.alert("Sucesso", "CSV exportado com sucesso!", [
+        {
+          text: "Compartilhar",
+          onPress: async () => {
+            try {
+              if (await Sharing.isAvailableAsync()) {
+                await Sharing.shareAsync(fileUri);
+              } else {
+                Alert.alert(
+                  "Erro",
+                  "Compartilhamento não disponível neste dispositivo.",
+                );
+              }
+            } catch (error) {
+              console.error("Erro ao compartilhar:", error);
+            }
+          },
+        },
+        { text: "OK" },
+      ]);
+    } catch (error) {
+      console.error("Erro ao exportar CSV:", error);
+      Alert.alert("Erro", "Não foi possível gerar o CSV.");
+    }
   };
 
   useEffect(() => {
     const loadData = async (): Promise<void> => {
       try {
         await initializeStore();
-        get(); // Carrega os dados após inicializar
+        get();
       } catch (e) {
         console.error("Erro ao inicializar banco:", e);
         Alert.alert("Erro", "Não foi possível carregar o banco de dados.");
@@ -128,56 +230,42 @@ export function Users() {
         <FlatList
           data={users}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => {
-            const id = item;
-            return (
-              <View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-evenly",
-                  }}
+          renderItem={({ item }) => (
+            <View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-evenly",
+                }}
+              >
+                <Text
+                  style={{ fontSize: 12, fontWeight: 500, color: "#333333" }}
                 >
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 500,
-                      color: "#333333",
-                    }}
-                  >
-                    {" "}
-                    {item.name}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 500,
-                      color: "#333333",
-                    }}
-                  >
-                    {item.email}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 500,
-                      color: "#333333",
-                    }}
-                  >
-                    {" "}
-                    {item.phone}
-                  </Text>
-                </View>
+                  {item.name}
+                </Text>
+                <Text
+                  style={{ fontSize: 12, fontWeight: 500, color: "#333333" }}
+                >
+                  {item.email}
+                </Text>
+                <Text
+                  style={{ fontSize: 12, fontWeight: 500, color: "#333333" }}
+                >
+                  {item.phone}
+                </Text>
               </View>
-            );
-          }}
+            </View>
+          )}
         />
+
         {users.length > 0 && (
           <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
               marginBottom: 20,
+              flexWrap: "wrap",
+              gap: 8,
             }}
           >
             <Pressable
@@ -185,6 +273,20 @@ export function Users() {
               onPress={() => setUploadModalVisible(true)}
             >
               <Text style={tw`text-white font-bold`}>Subir dados</Text>
+            </Pressable>
+
+            <Pressable
+              style={tw`bg-blue-500 p-4 rounded-md`}
+              onPress={saveUsersToFile}
+            >
+              <Text style={tw`text-white font-bold`}>Salvar arquivo</Text>
+            </Pressable>
+
+            <Pressable
+              style={tw`bg-green-600 p-4 rounded-md`}
+              onPress={exportUsersToCSV}
+            >
+              <Text style={tw`text-white font-bold`}>Exportar CSV</Text>
             </Pressable>
 
             <Pressable
@@ -263,7 +365,7 @@ export function Users() {
             <Input
               place="Digite uma nota"
               value={nota}
-              onChangeText={(value) => setNota(value)}
+              onChangeText={(value: string) => setNota(value)}
             />
             <View style={tw`flex-row justify-between`}>
               <Pressable

@@ -1,7 +1,6 @@
 import { Button } from "@/components/buttom";
 import { Logo } from "@/components/logo/Logo";
 import { ModalAcesso } from "@/components/modal";
-import { usePage } from "@/hooks/use-page";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import { Cog } from "lucide-react-native";
@@ -11,7 +10,6 @@ import { styles } from "./style";
 
 export function Home() {
   const router = useRouter();
-  const { loadSavedConfigs, getNextPage } = usePage();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalAdminVisible, setModalAdminVisible] = useState(false);
